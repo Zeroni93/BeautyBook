@@ -1,6 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+type CookieToSet = {
+  name: string
+  value: string
+  options?: Record<string, unknown>
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -14,8 +20,10 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+        setAll(cookiesToSet: CookieToSet[]) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            request.cookies.set(name, value)
+          )
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -59,12 +67,17 @@ async function getProviderOnboardingStatus(supabase: any, userId: string) {
     .eq('provider_id', userId)
     .eq('is_active', true)
 
-  const hasProfile = !!(provider.business_name && provider.address_line1 && provider.city)
+  const hasProfile = !!(
+    provider.business_name &&
+    provider.address_line1 &&
+    provider.city
+  )
   const hasActiveSubscription = provider.subscription_status === 'active'
   const hasService = (serviceCount || 0) > 0
   const hasAvailability = (availabilityCount || 0) > 0
 
-  const isComplete = hasProfile && hasActiveSubscription && hasService && hasAvailability
+  const isComplete =
+    hasProfile && hasActiveSubscription && hasService && hasAvailability
 
   // Determine next step
   let nextStep: string | undefined
@@ -84,10 +97,12 @@ async function getProviderOnboardingStatus(supabase: any, userId: string) {
 export async function middleware(request: NextRequest) {
   // Public routes that don't need auth
   const publicRoutes = ['/', '/providers', '/auth']
-  const isPublicRoute = publicRoutes.some(route => 
-    request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(`${route}/`)
+  const isPublicRoute = publicRoutes.some(
+    (route) =>
+      request.nextUrl.pathname === route ||
+      request.nextUrl.pathname.startsWith(`${route}/`)
   )
-  
+
   if (isPublicRoute) {
     return NextResponse.next()
   }
@@ -108,8 +123,10 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   // Allow anonymous users on public pages, redirect to auth for protected pages
   if (!user) {
     const redirectUrl = new URL('/auth/sign-in', request.url)
@@ -134,18 +151,29 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/client/dashboard', request.url))
       }
       // Unknown role, redirect to auth
-      return NextResponse.redirect(new URL('/auth/sign-in?error=invalid-role', request.url))
+      return NextResponse.redirect(
+        new URL('/auth/sign-in?error=invalid-role', request.url)
+      )
     }
 
     // Check onboarding status
-    const onboardingStatus = await getProviderOnboardingStatus(supabase, user.id)
-    
+    const onboardingStatus = await getProviderOnboardingStatus(
+      supabase,
+      user.id
+    )
+
     const currentPath = request.nextUrl.pathname
-    const isOnboardingPath = currentPath === '/provider/onboarding' || currentPath.startsWith('/provider/onboarding/')
+    const isOnboardingPath =
+      currentPath === '/provider/onboarding' ||
+      currentPath.startsWith('/provider/onboarding/')
     const isStripeCallback = currentPath.startsWith('/provider/stripe/')
-    
+
     // Onboarding guard logic
-    if (!onboardingStatus.isComplete && !isOnboardingPath && !isStripeCallback) {
+    if (
+      !onboardingStatus.isComplete &&
+      !isOnboardingPath &&
+      !isStripeCallback
+    ) {
       // Incomplete onboarding, redirect to onboarding with step
       let redirectPath = '/provider/onboarding'
       if (onboardingStatus.nextStep) {
@@ -165,9 +193,14 @@ export async function middleware(request: NextRequest) {
     if (userRole !== 'client') {
       // Redirect provider to provider dashboard or onboarding
       if (userRole === 'provider') {
-        const onboardingStatus = await getProviderOnboardingStatus(supabase, user.id)
+        const onboardingStatus = await getProviderOnboardingStatus(
+          supabase,
+          user.id
+        )
         if (onboardingStatus.isComplete) {
-          return NextResponse.redirect(new URL('/provider/dashboard', request.url))
+          return NextResponse.redirect(
+            new URL('/provider/dashboard', request.url)
+          )
         } else {
           let redirectPath = '/provider/onboarding'
           if (onboardingStatus.nextStep) {
@@ -177,7 +210,9 @@ export async function middleware(request: NextRequest) {
         }
       }
       // Unknown role, redirect to auth
-      return NextResponse.redirect(new URL('/auth/sign-in?error=invalid-role', request.url))
+      return NextResponse.redirect(
+        new URL('/auth/sign-in?error=invalid-role', request.url)
+      )
     }
   }
 
@@ -192,9 +227,14 @@ export async function middleware(request: NextRequest) {
     if (!adminUser) {
       // Redirect to appropriate dashboard based on role
       if (userRole === 'provider') {
-        const onboardingStatus = await getProviderOnboardingStatus(supabase, user.id)
+        const onboardingStatus = await getProviderOnboardingStatus(
+          supabase,
+          user.id
+        )
         if (onboardingStatus.isComplete) {
-          return NextResponse.redirect(new URL('/provider/dashboard', request.url))
+          return NextResponse.redirect(
+            new URL('/provider/dashboard', request.url)
+          )
         } else {
           let redirectPath = '/provider/onboarding'
           if (onboardingStatus.nextStep) {
@@ -205,7 +245,9 @@ export async function middleware(request: NextRequest) {
       } else if (userRole === 'client') {
         return NextResponse.redirect(new URL('/client/dashboard', request.url))
       }
-      return NextResponse.redirect(new URL('/?error=access-denied', request.url))
+      return NextResponse.redirect(
+        new URL('/?error=access-denied', request.url)
+      )
     }
   }
 
