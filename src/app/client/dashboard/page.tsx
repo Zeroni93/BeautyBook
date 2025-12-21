@@ -39,7 +39,9 @@ export default function ClientDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [nextBooking, setNextBooking] = useState<Booking | null>(null)
-  const [favoriteProvider, setFavoriteProvider] = useState<Provider | null>(null)
+  const [favoriteProvider, setFavoriteProvider] = useState<Provider | null>(
+    null
+  )
 
   useEffect(() => {
     loadDashboardData()
@@ -48,16 +50,18 @@ export default function ClientDashboard() {
   const loadDashboardData = async () => {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (user) {        
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (user) {
         // Load profile
         const { data: profileData } = await supabase
           .from('profiles')
           .select('display_name, role, avatar_url')
           .eq('user_id', user.id)
           .single()
-        
+
         if (profileData) {
           setProfile(profileData as Profile)
         }
@@ -65,7 +69,8 @@ export default function ClientDashboard() {
         // Load next upcoming booking
         const { data: nextBookingData } = await supabase
           .from('bookings')
-          .select(`
+          .select(
+            `
             id,
             start_time,
             end_time,
@@ -77,7 +82,8 @@ export default function ClientDashboard() {
             service:service_id (
               title
             )
-          `)
+          `
+          )
           .eq('client_id', user.id)
           .gte('start_time', new Date().toISOString())
           .eq('status', 'confirmed')
@@ -120,19 +126,19 @@ export default function ClientDashboard() {
     return {
       date: dateTime.toLocaleDateString('en-US', {
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
       }),
       time: dateTime.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
-        hour12: true
-      })
+        hour12: true,
+      }),
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-slate-900">
         <div className="dark:text-slate-200">Loading...</div>
       </div>
     )
@@ -140,9 +146,9 @@ export default function ClientDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      <header className="bg-white dark:bg-slate-800 shadow">
-        <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-slate-100">
+      <header className="bg-white shadow dark:bg-slate-800">
+        <div className="container mx-auto flex items-center justify-between px-4 py-6">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 md:text-3xl">
             BeautyBook
           </h1>
           <Button onClick={handleSignOut} variant="outline">
@@ -154,7 +160,7 @@ export default function ClientDashboard() {
       <main className="container mx-auto px-4 py-8">
         {/* Profile Header Section */}
         <div className="mb-8">
-          <Card className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+          <Card className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 {/* Avatar */}
@@ -163,13 +169,13 @@ export default function ClientDashboard() {
                   displayName={profile?.display_name || 'Client'}
                   size="md"
                 />
-                
+
                 {/* Text */}
                 <div>
-                  <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-slate-100">
+                  <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100 md:text-2xl">
                     Welcome back, {profile?.display_name || 'Client'}!
                   </h1>
-                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
                     Manage your BeautyBook profile and bookings.
                   </p>
                 </div>
@@ -178,9 +184,10 @@ export default function ClientDashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{/* Next Appointment Card */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Next Appointment Card */}
-          <Card className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+          {/* Next Appointment Card */}
+          <Card className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <CardHeader>
               <CardTitle className="text-lg font-semibold dark:text-slate-100">
                 Next Appointment
@@ -194,39 +201,40 @@ export default function ClientDashboard() {
                       {nextBooking.service.title}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-slate-400">
-                      {formatDateTime(nextBooking.start_time).date}, {formatDateTime(nextBooking.start_time).time}
+                      {formatDateTime(nextBooking.start_time).date},{' '}
+                      {formatDateTime(nextBooking.start_time).time}
                     </p>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {(nextBooking.provider.business_name || nextBooking.provider.display_name).charAt(0)}
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500">
+                      <span className="text-sm font-medium text-white">
+                        {(
+                          nextBooking.provider.business_name ||
+                          nextBooking.provider.display_name
+                        ).charAt(0)}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="font-medium text-gray-900 dark:text-slate-100">
-                        {nextBooking.provider.business_name || nextBooking.provider.display_name}
+                        {nextBooking.provider.business_name ||
+                          nextBooking.provider.display_name}
                       </span>
-                      <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                      <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
                         Verified
                       </span>
                     </div>
                   </div>
                   <Link href="/client/bookings">
-                    <Button className="w-full">
-                      View Booking
-                    </Button>
+                    <Button className="w-full">View Booking</Button>
                   </Link>
                 </div>
               ) : (
-                <div className="text-center py-4">
-                  <p className="text-gray-500 dark:text-slate-400 mb-4">
+                <div className="py-4 text-center">
+                  <p className="mb-4 text-gray-500 dark:text-slate-400">
                     No upcoming appointments
                   </p>
                   <Link href="/providers">
-                    <Button className="w-full">
-                      Browse Providers
-                    </Button>
+                    <Button className="w-full">Browse Providers</Button>
                   </Link>
                 </div>
               )}
@@ -234,7 +242,7 @@ export default function ClientDashboard() {
           </Card>
 
           {/* Favorite Providers Card */}
-          <Card className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+          <Card className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <CardHeader>
               <CardTitle className="text-lg font-semibold dark:text-slate-100">
                 Favorite Providers
@@ -244,38 +252,37 @@ export default function ClientDashboard() {
               {favoriteProvider ? (
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-medium">
-                        {(favoriteProvider.business_name || favoriteProvider.display_name).charAt(0)}
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500">
+                      <span className="font-medium text-white">
+                        {(
+                          favoriteProvider.business_name ||
+                          favoriteProvider.display_name
+                        ).charAt(0)}
                       </span>
                     </div>
                     <div>
                       <p className="font-medium text-gray-900 dark:text-slate-100">
-                        {favoriteProvider.business_name || favoriteProvider.display_name}
+                        {favoriteProvider.business_name ||
+                          favoriteProvider.display_name}
                       </p>
                       <p className="text-sm text-gray-500 dark:text-slate-400">
-                        {favoriteProvider.city && favoriteProvider.state 
+                        {favoriteProvider.city && favoriteProvider.state
                           ? `${favoriteProvider.city}, ${favoriteProvider.state}`
-                          : 'Location not specified'
-                        }
+                          : 'Location not specified'}
                       </p>
                     </div>
                   </div>
                   <Link href="/providers">
-                    <Button className="w-full">
-                      Browse Providers
-                    </Button>
+                    <Button className="w-full">Browse Providers</Button>
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <p className="text-gray-500 dark:text-slate-400">
-                    You don't have any favorite providers yet
+                    You don&apos;t have any favorite providers yet
                   </p>
                   <Link href="/providers">
-                    <Button className="w-full">
-                      Browse Providers
-                    </Button>
+                    <Button className="w-full">Browse Providers</Button>
                   </Link>
                 </div>
               )}
@@ -283,41 +290,47 @@ export default function ClientDashboard() {
           </Card>
 
           {/* My Bookings Card */}
-          <Card className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+          <Card className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <CardHeader>
               <CardTitle className="text-lg font-semibold dark:text-slate-100">
                 My Bookings
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              <p className="mb-4 text-sm text-gray-500 dark:text-slate-400">
                 Manage your appointments
               </p>
               <Link href="/client/bookings">
-                <Button className="w-full">
-                  View Bookings
-                </Button>
+                <Button className="w-full">View Bookings</Button>
               </Link>
             </CardContent>
           </Card>
 
           {/* Recommended Services Card */}
-          <Card className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+          <Card className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <CardHeader>
               <CardTitle className="text-lg font-semibold dark:text-slate-100">
                 Recommended Services
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 dark:text-slate-100">Facial</h4>
-                <p className="text-sm text-gray-500 dark:text-slate-400">Skincare</p>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm text-gray-600 dark:text-slate-300">45 min</span>
-                  <span className="font-semibold text-gray-900 dark:text-slate-100">$80.00</span>
+              <div className="rounded-lg bg-gray-50 p-4 dark:bg-slate-700">
+                <h4 className="font-medium text-gray-900 dark:text-slate-100">
+                  Facial
+                </h4>
+                <p className="text-sm text-gray-500 dark:text-slate-400">
+                  Skincare
+                </p>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-slate-300">
+                    45 min
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-slate-100">
+                    $80.00
+                  </span>
                 </div>
               </div>
-              <Link href="/providers" className="block mt-4">
+              <Link href="/providers" className="mt-4 block">
                 <Button className="w-full" variant="outline">
                   Browse Services
                 </Button>
@@ -326,20 +339,18 @@ export default function ClientDashboard() {
           </Card>
 
           {/* Settings Card */}
-          <Card className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 md:col-span-1">
+          <Card className="rounded-xl border border-gray-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800 md:col-span-1">
             <CardHeader>
               <CardTitle className="text-lg font-semibold dark:text-slate-100">
                 Settings
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              <p className="mb-4 text-sm text-gray-500 dark:text-slate-400">
                 Configure your account settings
               </p>
               <Link href="/settings">
-                <Button className="w-full">
-                  Go to Settings
-                </Button>
+                <Button className="w-full">Go to Settings</Button>
               </Link>
             </CardContent>
           </Card>

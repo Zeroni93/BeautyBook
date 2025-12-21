@@ -10,7 +10,13 @@ import { createClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 
 // Force dynamic rendering for auth page
 export const dynamic = 'force-dynamic'
@@ -46,12 +52,13 @@ function SignInForm() {
 
     try {
       const supabase = createClient()
-      
+
       // Sign in the user
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      })
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        })
 
       if (authError) {
         setError(authError.message)
@@ -60,11 +67,11 @@ function SignInForm() {
 
       if (authData.user) {
         // Get user profile to determine role
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile, error: profileError } = (await supabase
           .from('profiles')
           .select('role')
           .eq('user_id', authData.user.id)
-          .single() as { data: UserProfile | null; error: any }
+          .single()) as { data: UserProfile | null; error: any }
 
         if (profileError) {
           console.error('Profile fetch error:', profileError)
@@ -75,7 +82,7 @@ function SignInForm() {
 
         // Check for redirect parameter
         const redirectUrl = searchParams.get('redirect') || '/'
-        
+
         // Provider-specific landing logic with onboarding check
         if (profile?.role === 'provider') {
           if (redirectUrl !== '/') {
@@ -88,16 +95,18 @@ function SignInForm() {
             const response = await fetch('/api/onboarding/status', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ providerId: authData.user.id })
+              body: JSON.stringify({ providerId: authData.user.id }),
             })
-            
+
             if (response.ok) {
               const { isComplete, nextStep } = await response.json()
-              
+
               if (isComplete) {
                 window.location.href = '/provider/dashboard'
               } else {
-                const onboardingPath = nextStep ? `/provider/onboarding?step=${nextStep}` : '/provider/onboarding'
+                const onboardingPath = nextStep
+                  ? `/provider/onboarding?step=${nextStep}`
+                  : '/provider/onboarding'
                 window.location.href = onboardingPath
               }
             } else {
@@ -126,16 +135,20 @@ function SignInForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50 p-4 dark:from-slate-900 dark:to-slate-800">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl dark:text-slate-100">Welcome Back</CardTitle>
-          <CardDescription className="dark:text-slate-400">Sign in to your Beauty Book account</CardDescription>
+          <CardTitle className="text-2xl dark:text-slate-100">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="dark:text-slate-400">
+            Sign in to your Beauty Book account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 px-3 py-2 rounded text-sm">
+              <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-700 dark:bg-red-900/20 dark:text-red-400">
                 {error}
               </div>
             )}
@@ -149,7 +162,9 @@ function SignInForm() {
                 {...form.register('email')}
               />
               {form.formState.errors.email && (
-                <p className="text-red-600 dark:text-red-400 text-sm">{form.formState.errors.email.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.email.message}
+                </p>
               )}
             </div>
 
@@ -162,7 +177,9 @@ function SignInForm() {
                 {...form.register('password')}
               />
               {form.formState.errors.password && (
-                <p className="text-red-600 dark:text-red-400 text-sm">{form.formState.errors.password.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.password.message}
+                </p>
               )}
             </div>
 
@@ -173,8 +190,11 @@ function SignInForm() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-slate-400">
-              Don't have an account?{' '}
-              <Link href="/auth/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline">
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/auth/sign-up"
+                className="text-blue-600 hover:underline dark:text-blue-400"
+              >
                 Create one
               </Link>
             </p>

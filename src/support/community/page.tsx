@@ -17,8 +17,10 @@ export default function CommunityPage() {
 
   const checkAuth = async () => {
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
     if (!user) {
       router.push('/auth/sign-in')
       return
@@ -30,7 +32,7 @@ export default function CommunityPage() {
       .select('role')
       .eq('user_id', user.id)
       .single()
-    
+
     setUserRole((profile as any)?.role || null)
   }
 
@@ -45,53 +47,55 @@ export default function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
+      <div className="mx-auto max-w-2xl px-4">
         <div className="mb-6">
-          <Link href={getBackUrl()} className="text-sm text-gray-600 hover:text-gray-900">
+          <Link
+            href={getBackUrl()}
+            className="text-sm text-gray-600 hover:text-gray-900"
+          >
             ← Back to Dashboard
           </Link>
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Community</CardTitle>
           </CardHeader>
-          <CardContent className="text-center py-12">
+          <CardContent className="py-12 text-center">
             <div className="space-y-6">
               <div className="text-6xl">👥</div>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                <h2 className="mb-2 text-2xl font-semibold text-gray-900">
                   Community Features Coming Soon
                 </h2>
-                <p className="text-gray-600 max-w-md mx-auto">
-                  We're building an amazing community platform where beauty providers can 
-                  connect, share tips, and grow their businesses together.
+                <p className="mx-auto max-w-md text-gray-600">
+                  We&apos;re building an amazing community platform where beauty
+                  providers can connect, share tips, and grow their businesses
+                  together.
                 </p>
               </div>
-              
+
               <div className="space-y-4">
                 <p className="text-sm text-gray-500">
                   In the meantime, feel free to reach out for support:
                 </p>
                 <div className="flex justify-center gap-4">
                   <Button asChild variant="outline">
-                    <Link href={"/support/contact" as any}>
+                    <Link href={'/support/contact' as any}>
                       Contact Support
                     </Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link href={"/support/documentation" as any}>
+                    <Link href={'/support/documentation' as any}>
                       View Documentation
                     </Link>
                   </Button>
                 </div>
               </div>
-              
-              <div className="pt-6 border-t">
+
+              <div className="border-t pt-6">
                 <Button asChild>
-                  <Link href={getBackUrl()}>
-                    Back to Dashboard
-                  </Link>
+                  <Link href={getBackUrl()}>Back to Dashboard</Link>
                 </Button>
               </div>
             </div>

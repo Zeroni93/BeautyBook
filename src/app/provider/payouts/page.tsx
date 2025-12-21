@@ -35,10 +35,12 @@ export default function ProviderPayoutsPage() {
   const loadPayoutsData = async () => {
     try {
       setLoading(true)
-      
+
       const supabase = createClient()
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser()
+
       if (!authUser) {
         window.location.href = '/auth/sign-in'
         return
@@ -71,7 +73,6 @@ export default function ProviderPayoutsPage() {
       }
 
       setPayouts(payoutsData || [])
-
     } catch (error) {
       console.error('Error loading payouts:', error)
     } finally {
@@ -81,16 +82,20 @@ export default function ProviderPayoutsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'paid': return 'text-green-600 bg-green-50'
-      case 'pending': return 'text-yellow-600 bg-yellow-50'
-      case 'failed': return 'text-red-600 bg-red-50'
-      default: return 'text-gray-600 bg-gray-50'
+      case 'paid':
+        return 'text-green-600 bg-green-50'
+      case 'pending':
+        return 'text-yellow-600 bg-yellow-50'
+      case 'failed':
+        return 'text-red-600 bg-red-50'
+      default:
+        return 'text-gray-600 bg-gray-50'
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div>Loading payouts...</div>
       </div>
     )
@@ -102,19 +107,20 @@ export default function ProviderPayoutsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
-        <div className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <div className="container mx-auto flex items-center justify-between px-4 py-6">
           <div>
-            <Link href="/provider/dashboard" className="text-sm text-blue-600 hover:underline">
+            <Link
+              href="/provider/dashboard"
+              className="text-sm text-blue-600 hover:underline"
+            >
               ← Back to Dashboard
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 mt-1">
+            <h1 className="mt-1 text-2xl font-bold text-gray-900">
               Payouts & Earnings
             </h1>
           </div>
           {hasStripeConnect && (
-            <Button variant="outline">
-              Stripe Dashboard
-            </Button>
+            <Button variant="outline">Stripe Dashboard</Button>
           )}
         </div>
       </header>
@@ -129,7 +135,7 @@ export default function ProviderPayoutsPage() {
                   <h3 className="text-lg font-semibold text-orange-800">
                     Connect Your Stripe Account
                   </h3>
-                  <p className="text-orange-600 mt-1">
+                  <p className="mt-1 text-orange-600">
                     You need to connect your Stripe account to receive payments
                   </p>
                 </div>
@@ -149,7 +155,7 @@ export default function ProviderPayoutsPage() {
                   <h3 className="text-lg font-semibold text-yellow-800">
                     Subscription Required
                   </h3>
-                  <p className="text-yellow-600 mt-1">
+                  <p className="mt-1 text-yellow-600">
                     You need an active subscription to receive payments
                   </p>
                 </div>
@@ -169,12 +175,12 @@ export default function ProviderPayoutsPage() {
                   <h3 className="text-lg font-semibold text-green-800">
                     Stripe Account Connected
                   </h3>
-                  <p className="text-green-600 mt-1">
-                    You're all set to receive payments
+                  <p className="mt-1 text-green-600">
+                    You&apos;re all set to receive payments
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                  <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-800">
                     Connected
                   </span>
                 </div>
@@ -184,7 +190,7 @@ export default function ProviderPayoutsPage() {
         )}
 
         {/* Earnings Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
@@ -221,9 +227,13 @@ export default function ProviderPayoutsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {formatCurrency(payouts.reduce((sum, payout) => sum + payout.amount_cents, 0))}
+                {formatCurrency(
+                  payouts.reduce((sum, payout) => sum + payout.amount_cents, 0)
+                )}
               </div>
-              <p className="text-sm text-gray-500">{payouts.length} transactions</p>
+              <p className="text-sm text-gray-500">
+                {payouts.length} transactions
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -235,8 +245,8 @@ export default function ProviderPayoutsPage() {
           </CardHeader>
           <CardContent>
             {payouts.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No payouts yet</p>
+              <div className="py-8 text-center">
+                <p className="mb-4 text-gray-500">No payouts yet</p>
                 <p className="text-sm text-gray-400">
                   Complete bookings to start earning money
                 </p>
@@ -246,45 +256,50 @@ export default function ProviderPayoutsPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Date
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Transfer ID
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Amount
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Booking
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 bg-white">
                     {payouts.map((payout) => (
                       <tr key={payout.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {new Date(payout.created_at).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
+                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                          {new Date(payout.created_at).toLocaleDateString(
+                            'en-US',
+                            {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            }
+                          )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                        <td className="whitespace-nowrap px-6 py-4 font-mono text-sm text-gray-600">
                           {payout.stripe_transfer_id}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                           {formatCurrency(payout.amount_cents)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(payout.status)}`}>
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${getStatusColor(payout.status)}`}
+                          >
                             {payout.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
                           <Button size="sm" variant="outline">
                             View Booking
                           </Button>
@@ -306,25 +321,31 @@ export default function ProviderPayoutsPage() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium mb-2">How Payouts Work</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Payments are automatically transferred to your Stripe account</li>
-                  <li>• Stripe typically deposits funds within 2-7 business days</li>
+                <h4 className="mb-2 font-medium">How Payouts Work</h4>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li>
+                    • Payments are automatically transferred to your Stripe
+                    account
+                  </li>
+                  <li>
+                    • Stripe typically deposits funds within 2-7 business days
+                  </li>
                   <li>• Platform fee (10%) is automatically deducted</li>
-                  <li>• You'll receive detailed transaction records</li>
+                  <li>• You&apos;ll receive detailed transaction records</li>
                 </ul>
               </div>
-              
+
               <div>
-                <h4 className="font-medium mb-2">Tax Information</h4>
+                <h4 className="mb-2 font-medium">Tax Information</h4>
                 <p className="text-sm text-gray-600">
-                  You're responsible for reporting earnings on your tax return. 
-                  You can download detailed reports from your Stripe dashboard.
+                  You&apos;re responsible for reporting earnings on your tax
+                  return. You can download detailed reports from your Stripe
+                  dashboard.
                 </p>
               </div>
 
               <div>
-                <h4 className="font-medium mb-2">Need Help?</h4>
+                <h4 className="mb-2 font-medium">Need Help?</h4>
                 <div className="flex space-x-3">
                   <Button variant="outline" size="sm">
                     Contact Support
