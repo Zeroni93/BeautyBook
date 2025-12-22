@@ -11,7 +11,7 @@
     "test:e2e": "playwright test",
     "test:ui": "vitest --ui",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky",
+    "prepare": "node -e \"if (process.env.CI !== 'true') { require('child_process').execSync('husky', {stdio: 'inherit'}) }\"",
     "clean": "rimraf .next node_modules .turbo .cache && git clean -fdX -- .next || true",
     "rebuild": "npm run clean && npm install && npm run build"
   },

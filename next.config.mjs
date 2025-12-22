@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    typedRoutes: true,
-  },
+  typedRoutes: true,
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -39,6 +37,22 @@ const nextConfig = {
             value: 'origin-when-cross-origin',
           },
         ],
+      },
+    ]
+  },
+  async redirects() {
+    return [
+      // Redirect non-www to www for canonical domain
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'my-beauty-book.com',
+          },
+        ],
+        destination: 'https://www.my-beauty-book.com/:path*',
+        permanent: true,
       },
     ]
   },
