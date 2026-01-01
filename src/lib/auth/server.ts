@@ -2,6 +2,12 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { Database } from '@/lib/types'
 
+type CookieToSet = {
+  name: string
+  value: string
+  options?: Record<string, unknown>
+}
+
 export async function createClient() {
   const cookieStore = await cookies()
 
@@ -13,7 +19,7 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: CookieToSet[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options)
@@ -31,14 +37,18 @@ export async function createClient() {
 
 export async function getUser() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   return user
 }
 
 export async function getUserProfile() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   if (!user) return null
 
   const { data: profile, error } = await supabase
@@ -76,7 +86,7 @@ export async function requireRole(role: 'client' | 'provider') {
 export async function isAdmin() {
   const supabase = await createClient()
   const user = await getUser()
-  
+
   if (!user) return false
 
   const { data } = await supabase
